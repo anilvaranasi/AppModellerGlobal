@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_fix">
+    <sys_script_fix action="INSERT_OR_UPDATE">
+        <before>false</before>
+        <description/>
+        <name>FindtableReferences</name>
+        <record_for_rollback>false</record_for_rollback>
+        <script><![CDATA[var sDebug = 'Printing from Fixscript ';
+var columnHash = {};
+var grDict = new GlideRecord('sys_dictionary');
+var dictEnQuery = 'internal_type=script^ORinternal_type=script_plain^ORinternal_type=script_client^ORinternal_type=script_server^nameNOT LIKEvar__';
+grDict.addEncodedQuery(dictEnQuery);
+grDict.query();
+while (grDict.next()) {
+    if (global.JSUtil.nil(columnHash[grDict.name.toString()])) {
+        columnHash[grDict.name.toString()] = grDict.column_name;
+    } else {
+        columnHash[grDict.name.toString()] += "|" + grDict.column_name;
+    }
+}
+
+
+for (var key in columnHash) {
+    sDebug += key + "=" + columnHash[key] + "\n";
+}
+
+gs.print(sDebug);]]></script>
+        <sys_class_name>sys_script_fix</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-03-22 09:17:51</sys_created_on>
+        <sys_id>114152bf83102210b0abcfc0deaad308</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>FindtableReferences</sys_name>
+        <sys_package display_value="App Modeller Global" source="f1a7ba7c83102210b0abcfc0deaad309">f1a7ba7c83102210b0abcfc0deaad309</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App Modeller Global">f1a7ba7c83102210b0abcfc0deaad309</sys_scope>
+        <sys_update_name>sys_script_fix_114152bf83102210b0abcfc0deaad308</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-03-22 09:21:25</sys_updated_on>
+        <unloadable>false</unloadable>
+    </sys_script_fix>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>114152bf83102210b0abcfc0deaad308</id>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-03-22 09:17:51</sys_created_on>
+        <sys_id>45515ef383502210b0abcfc0deaad366</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-03-22 09:17:51</sys_updated_on>
+        <table>sys_script_fix</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>
