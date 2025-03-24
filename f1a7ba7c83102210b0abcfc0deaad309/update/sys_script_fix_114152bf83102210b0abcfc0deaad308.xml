@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_fix">
+    <sys_script_fix action="INSERT_OR_UPDATE">
+        <before>false</before>
+        <description/>
+        <name>testERDProcessorUtilsRefScripts</name>
+        <record_for_rollback>false</record_for_rollback>
+        <script><![CDATA[var sDebug = 'Printing from Fixscript ';
+var columnHash = {};
+var objectHash = {};
+var grDict = new GlideRecord('sys_dictionary');
+var dictEnQuery = 'internal_type=script^ORinternal_type=script_plain^ORinternal_type=script_client^ORinternal_type=script_server^nameNOT LIKEvar__';
+grDict.addEncodedQuery(dictEnQuery);
+grDict.query();
+while (grDict.next()) {
+    if (global.JSUtil.nil(columnHash[grDict.name.toString()])) {
+        columnHash[grDict.name.toString()] = grDict.element;
+    } else {
+        columnHash[grDict.name.toString()] += "|" + grDict.element;
+    }
+}
+for (var key in columnHash) {
+	var objArray = [];
+    //sDebug += key + "=" + columnHash[key] + "\n";
+    objArray = findTableRef(key, 'incident', columnHash[key]);
+	objectHash[key] = objArray;
+}
+
+gs.print(sDebug);
+
+function findTableRef(tableGr, tableQuery, columnString) {
+    var returnObjList;
+    var returnObjArray = [];
+    var grTable = new GlideRecord(tableGr);
+    //scriptLIKEnew GlideRecord('incident');^ORscriptLIKEnew GlideRecord('incident');
+    var enQuery = '';
+    var columnArray = columnString.split("|");
+    for (var k = 0; k < columnArray.length; k++) {
+        if (global.JSUtil.nil(enQuery)) {
+            enQuery = columnArray[k] + 'LIKEnew GlideRecord(' + "'" + tableQuery + "')";
+        } else {
+            enQuery += "^OR" + columnArray[k] + 'LIKEnew GlideRecord(' + "'" + tableQuery + "')";
+        }
+    }
+    grTable.addEncodedQuery(enQuery);
+    grTable.query();
+    while (grTable.next()) {
+        if (global.JSUtil.nil(returnObjList)) {
+            returnObjList = grTable.sys_id.toString();
+        } else {
+            returnObjList += "|" + grTable.sys_id.toString();
+        }
+    }
+    if (global.JSUtil.notNil(returnObjList)) {
+        returnObjArray = returnObjList.split("|");
+    }
+    return (returnObjArray);
+}]]></script>
+        <sys_class_name>sys_script_fix</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-03-22 09:17:51</sys_created_on>
+        <sys_id>114152bf83102210b0abcfc0deaad308</sys_id>
+        <sys_mod_count>13</sys_mod_count>
+        <sys_name>testERDProcessorUtilsRefScripts</sys_name>
+        <sys_package display_value="App Modeller Global" source="f1a7ba7c83102210b0abcfc0deaad309">f1a7ba7c83102210b0abcfc0deaad309</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="App Modeller Global">f1a7ba7c83102210b0abcfc0deaad309</sys_scope>
+        <sys_update_name>sys_script_fix_114152bf83102210b0abcfc0deaad308</sys_update_name>
+        <sys_updated_by>avaranasi</sys_updated_by>
+        <sys_updated_on>2025-03-22 17:09:51</sys_updated_on>
+        <unloadable>false</unloadable>
+    </sys_script_fix>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>114152bf83102210b0abcfc0deaad308</id>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2025-03-22 09:17:51</sys_created_on>
+        <sys_id>45515ef383502210b0abcfc0deaad366</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-03-22 09:17:51</sys_updated_on>
+        <table>sys_script_fix</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>
