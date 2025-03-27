@@ -5,7 +5,7 @@
         <api_name>global.ERDProcessorUtils</api_name>
         <caller_access/>
         <client_callable>false</client_callable>
-        <description/>
+        <description>This script include is an extension of ERC Processor utils. This is used to get referenced tables, scripts and flow</description>
         <mobile_callable>false</mobile_callable>
         <name>ERDProcessorUtils</name>
         <sandbox_callable>false</sandbox_callable>
@@ -13,6 +13,7 @@
 ERDProcessorUtils.prototype = Object.extendsObject(ERDProcessor, {
     initialize: function() {
         ERDProcessor.prototype.initialize.call(this);
+        this.sDebug = 'Printing from Fixscript ';
     },
     /*custom changes*/
     //Provides list of tables that are referenced by a given table
@@ -28,35 +29,40 @@ ERDProcessorUtils.prototype = Object.extendsObject(ERDProcessor, {
         return referencedTables;
     },
     getScriptReferences: function(table) {
-        var sDebug = 'Printing from Fixscript ';
         var columnHash = {};
         var objectHash = {};
-        var grDict = new GlideRecord('sys_dictionary');
+        var grDictScript = new GlideRecord('sys_dictionary');
         //  var dictEnQuery = 'internal_type=script^ORinternal_type=script_plain^ORinternal_type=script_client^ORinternal_type=script_server^nameNOT LIKEvar__^nameSTARTSWITHsys_sc';
         var dictEnQuery = 'internal_type=script^ORinternal_type=script_plain^ORinternal_type=script_client^ORinternal_type=script_server^nameNOT LIKEvar__';
-        grDict.addEncodedQuery(dictEnQuery);
-        grDict.query();
-        while (grDict.next()) {
-            if (global.JSUtil.nil(columnHash[grDict.name.toString()])) {
-                columnHash[grDict.name.toString()] = grDict.element;
+        //this.sDebug += " dictEnQuery=" + dictEnQuery + "\n";
+        grDictScript.addEncodedQuery(dictEnQuery);
+        grDictScript.orderBy('name');
+        grDictScript.query();
+        //this.sDebug += " grDictScript=" + grDictScript.getRowCount() + "\n";
+        while (grDictScript.next()) {
+            if (global.JSUtil.nil(columnHash[grDictScript.name.toString()])) {
+                var elementName = '';
+                elementName = grDictScript.element.toString();
+                columnHash[grDictScript.name.toString()] = elementName;
             } else {
-                columnHash[grDict.name.toString()] += "|" + grDict.element;
+                columnHash[grDictScript.name.toString()] += "|" + elementName;
             }
         }
         for (var key in columnHash) {
             var objArray = [];
-            //sDebug += key + "=" + columnHash[key] + "\n";
+            //this.sDebug += key + "=" + columnHash[key] + "\n";
             try {
                 objArray = this._lookupTableInScript(key, table, columnHash[key]);
                 if (objArray.length > 0) {
+                    //this.sDebug += " objArray=" + objArray + "\n";
                     objectHash[key] = objArray;
                 }
             } catch (e) {
+                this.sDebug += 'exception: ' + e;
                 gs.print("exception: " + e);
             }
         }
-
-        //gs.print(sDebug);
+        //gs.print(this.sDebug);
         return objectHash;
     },
     _lookupTableInScript: function(tableGr, tableQuery, columnString) {
@@ -67,12 +73,15 @@ ERDProcessorUtils.prototype = Object.extendsObject(ERDProcessor, {
         var enQuery = '';
         var columnArray = columnString.split("|");
         for (var k = 0; k < columnArray.length; k++) {
+            var colName = '';
+            colName = columnArray[k];
             if (global.JSUtil.nil(enQuery)) {
-                enQuery = columnArray[k] + 'LIKEnew GlideRecord(' + "'" + tableQuery + "')";
+                enQuery = colName + 'LIKEnew GlideRecord(' + "'" + tableQuery + "')";
             } else {
-                enQuery += "^OR" + columnArray[k] + 'LIKEnew GlideRecord(' + "'" + tableQuery + "')";
+                enQuery += "^OR" + colName + 'LIKEnew GlideRecord(' + "'" + tableQuery + "')";
             }
         }
+        //this.sDebug += tableGr + "=" + columnArray + "\n";
         var isValidQuery = grTable.isValidEncodedQuery(enQuery);
         if (isValidQuery) {
             grTable.addEncodedQuery(enQuery);
@@ -83,6 +92,7 @@ ERDProcessorUtils.prototype = Object.extendsObject(ERDProcessor, {
                 } else {
                     returnObjList += "|" + grTable.sys_id.toString();
                 }
+                //this.sDebug += "grTable.sys_id.toString()" + "=" + grTable.sys_id.toString() + "\n";
             }
             if (global.JSUtil.notNil(returnObjList) && returnObjList.length > 1) {
                 returnObjArray = returnObjList.split("|");
@@ -96,14 +106,14 @@ ERDProcessorUtils.prototype = Object.extendsObject(ERDProcessor, {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2025-03-13 04:30:31</sys_created_on>
         <sys_id>cee8b2b083502210b0abcfc0deaad377</sys_id>
-        <sys_mod_count>11</sys_mod_count>
+        <sys_mod_count>30</sys_mod_count>
         <sys_name>ERDProcessorUtils</sys_name>
         <sys_package display_value="App Modeller Global" source="f1a7ba7c83102210b0abcfc0deaad309">f1a7ba7c83102210b0abcfc0deaad309</sys_package>
         <sys_policy/>
         <sys_scope display_value="App Modeller Global">f1a7ba7c83102210b0abcfc0deaad309</sys_scope>
         <sys_update_name>sys_script_include_cee8b2b083502210b0abcfc0deaad377</sys_update_name>
-        <sys_updated_by>avaranasi</sys_updated_by>
-        <sys_updated_on>2025-03-23 05:51:07</sys_updated_on>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2025-03-25 06:58:53</sys_updated_on>
     </sys_script_include>
     <sys_es_latest_script action="INSERT_OR_UPDATE">
         <id>cee8b2b083502210b0abcfc0deaad377</id>
