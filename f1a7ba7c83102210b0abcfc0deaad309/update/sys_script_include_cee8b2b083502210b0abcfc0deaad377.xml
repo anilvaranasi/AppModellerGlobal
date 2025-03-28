@@ -5,7 +5,7 @@
         <api_name>global.ERDProcessorUtils</api_name>
         <caller_access/>
         <client_callable>false</client_callable>
-        <description>This script include is an extension of ERC Processor utils. This is used to get referenced tables, scripts and flow</description>
+        <description>Updated ERD processor utils</description>
         <mobile_callable>false</mobile_callable>
         <name>ERDProcessorUtils</name>
         <sandbox_callable>false</sandbox_callable>
@@ -33,7 +33,8 @@ ERDProcessorUtils.prototype = Object.extendsObject(ERDProcessor, {
         var objectHash = {};
         var grDictScript = new GlideRecord('sys_dictionary');
         //  var dictEnQuery = 'internal_type=script^ORinternal_type=script_plain^ORinternal_type=script_client^ORinternal_type=script_server^nameNOT LIKEvar__^nameSTARTSWITHsys_sc';
-        var dictEnQuery = 'internal_type=script^ORinternal_type=script_plain^ORinternal_type=script_client^ORinternal_type=script_server^nameNOT LIKEvar__';
+        // var dictEnQuery = 'internal_type=script^ORinternal_type=script_plain^ORinternal_type=script_client^ORinternal_type=script_server^nameNOT LIKEvar__';
+        var dictEnQuery = "internal_type=script^ORinternal_type=script_plain^ORinternal_type=script_client^ORinternal_type=script_server^nameNOT LIKEvar__^nameNOT LIKE_context^NQnameSTARTSWITHsys_hub^elementSTARTSWITHlabel_cache";
         //this.sDebug += " dictEnQuery=" + dictEnQuery + "\n";
         grDictScript.addEncodedQuery(dictEnQuery);
         grDictScript.orderBy('name');
@@ -62,7 +63,7 @@ ERDProcessorUtils.prototype = Object.extendsObject(ERDProcessor, {
                 gs.print("exception: " + e);
             }
         }
-        //gs.print(this.sDebug);
+        //gs.info(this.sDebug);
         return objectHash;
     },
     _lookupTableInScript: function(tableGr, tableQuery, columnString) {
@@ -75,13 +76,22 @@ ERDProcessorUtils.prototype = Object.extendsObject(ERDProcessor, {
         for (var k = 0; k < columnArray.length; k++) {
             var colName = '';
             colName = columnArray[k];
-            if (global.JSUtil.nil(enQuery)) {
-                enQuery = colName + 'LIKEnew GlideRecord(' + "'" + tableQuery + "')";
+            if (colName != 'label_cache') {
+                if (global.JSUtil.nil(enQuery)) {
+                    enQuery = colName + 'LIKEnew GlideRecord(' + "'" + tableQuery + "')";
+                } else {
+                    enQuery += "^OR" + colName + 'LIKEnew GlideRecord(' + "'" + tableQuery + "')";
+                }
             } else {
-                enQuery += "^OR" + colName + 'LIKEnew GlideRecord(' + "'" + tableQuery + "')";
+                if (global.JSUtil.nil(enQuery)) {
+                    //label_cacheLIKE"parent_table_name":"sn_itam_common_donation_order"
+                    enQuery = colName + 'LIKE"parent_table_name":"' + tableQuery + '"';
+                } else {
+                    enQuery += "^OR" + colName + 'LIKE"parent_table_name":"' + tableQuery + '"';
+                }
             }
         }
-        //this.sDebug += tableGr + "=" + columnArray + "\n";
+        this.sDebug += tableGr + "=" + enQuery + "\n";
         var isValidQuery = grTable.isValidEncodedQuery(enQuery);
         if (isValidQuery) {
             grTable.addEncodedQuery(enQuery);
@@ -106,14 +116,14 @@ ERDProcessorUtils.prototype = Object.extendsObject(ERDProcessor, {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2025-03-13 04:30:31</sys_created_on>
         <sys_id>cee8b2b083502210b0abcfc0deaad377</sys_id>
-        <sys_mod_count>30</sys_mod_count>
+        <sys_mod_count>37</sys_mod_count>
         <sys_name>ERDProcessorUtils</sys_name>
         <sys_package display_value="App Modeller Global" source="f1a7ba7c83102210b0abcfc0deaad309">f1a7ba7c83102210b0abcfc0deaad309</sys_package>
         <sys_policy/>
         <sys_scope display_value="App Modeller Global">f1a7ba7c83102210b0abcfc0deaad309</sys_scope>
         <sys_update_name>sys_script_include_cee8b2b083502210b0abcfc0deaad377</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2025-03-25 06:58:53</sys_updated_on>
+        <sys_updated_on>2025-03-28 11:40:53</sys_updated_on>
     </sys_script_include>
     <sys_es_latest_script action="INSERT_OR_UPDATE">
         <id>cee8b2b083502210b0abcfc0deaad377</id>
